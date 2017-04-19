@@ -3,8 +3,7 @@ window.addEventListener('DOMContentLoaded', function() {
     var elements = [];
     var actions = ['trans', 'rotate', 'scale', 'shear'];
     var dimensions = ['x', 'y', 'z'];
-    // 3: House, 0: Tree, 5: Door
-    var objects3D = [1, 9, 5];
+    var objects3D = ["Boat", "Claw"];
     var actualAction = actions[0];
     var actualObject = objects3D[0];
     var engine = new BABYLON.Engine(canvas, true);
@@ -16,11 +15,12 @@ window.addEventListener('DOMContentLoaded', function() {
     var shearY = 0;
     var shearZ = 0;
 
-    engine.enableOfflineSupport = false; // Dont require a manifest file
+    engine.enableOfflineSupport = false;
 
     var createScene = function() {
         var scene = new BABYLON.Scene(engine);
         scene.clearColor = new BABYLON.Color3.White();
+        scene.collisionsEnabled = true;
 
         var camera = new BABYLON.ArcRotateCamera(
             "arcCam",
@@ -31,6 +31,8 @@ window.addEventListener('DOMContentLoaded', function() {
             scene
         );
         camera.attachControl(canvas, true);
+        camera.checkCollisions = true;
+
         var light = new BABYLON.PointLight(
             "PointLight",
             new BABYLON.Vector3(0, 0, 0),
@@ -50,8 +52,11 @@ window.addEventListener('DOMContentLoaded', function() {
                 );
             }
         );
-        scene.fogMode = BABYLON.Scene.FOGMODE_EXP2;
-        scene.fogDensity = 0.01;
+
+        elements.forEach(function(element) {
+            element.checkCollisions = true;
+        });
+
         scene.registerBeforeRender(function() {});
 
         return scene;
@@ -64,6 +69,49 @@ window.addEventListener('DOMContentLoaded', function() {
     }
 
     var onKeyDown = function(evt) {
+        //W
+        if (evt.keyCode == 87) {
+            var transVector = new BABYLON.Vector3(1, 0, 0);
+            translateElements(elements[0], transVector);
+        }
+
+        //S
+        if (evt.keyCode == 83) {
+            var transVector = new BABYLON.Vector3(-1, 0, 0);
+            console.log(elements);
+            translateElements(elements.filter(getBoat)[0], transVector);
+        }
+
+        //A
+        if (evt.keyCode == 65) {
+            rotateElements(elements.filter(getBoat)[0], BABYLON.Axis.Y, -Math.PI / 16);
+        }
+
+        //D
+        if (evt.keyCode == 68) {
+            rotateElements(elements.filter(getBoat)[0], BABYLON.Axis.Y, Math.PI / 16);
+        }
+
+        //K
+        if (evt.keyCode == 75) {
+            rotateElements(elements.filter(getClaw)[0], BABYLON.Axis.Y, -Math.PI / 12);
+        }
+
+        //;
+        if (evt.keyCode == 192) {
+            rotateElements(elements.filter(getClaw)[0], BABYLON.Axis.Y, Math.PI / 12);
+        }
+
+        //I
+        if (evt.keyCode == 73) {
+            rotateElements(elements.filter(getCrane)[0], BABYLON.Axis.Y, -Math.PI / 12);
+        }
+
+        //P
+        if (evt.keyCode == 80) {
+            rotateElements(elements.filter(getCrane)[0], BABYLON.Axis.Y, Math.PI / 12);
+        }
+
         //help
         if (evt.keyCode == 57) {
             var helpBlock = document.getElementById('helpBlock');
@@ -80,6 +128,7 @@ window.addEventListener('DOMContentLoaded', function() {
             help = !help;
         }
 
+        console.log(evt.keyCode);
     };
 
     var wireFrame = function(elements) {
@@ -108,13 +157,11 @@ window.addEventListener('DOMContentLoaded', function() {
         });
     };
 
-    var translateElements = function(element, houseVector, treeGroundVector) {
-        element.translate(houseVector, 1.0, BABYLON.Space.LOCAL);
+    var translateElements = function(element, vector) {
+        element.translate(vector, 1.0, BABYLON.Space.LOCAL);
     };
 
     var rotateElements = function(element, vector, factor) {
-        var middle = getMiddlePosition(element);
-        console.log(middle);
         element.rotate(vector, factor, BABYLON.Space.LOCAL);
     };
 
@@ -135,22 +182,16 @@ window.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    var openDoor = function(element) {
-        element.rotate(BABYLON.Axis.Y, -Math.PI / 4, BABYLON.Space.LOCAL);
-    };
+    function getClaw(item) {
+        return item.id === "Claw";
+    }
 
-    var closeDoor = function(element) {
-        element.rotate(BABYLON.Axis.Y, Math.PI / 4, BABYLON.Space.LOCAL);
-    };
+    function getCrane(item) {
+        return item.id === "Crane";
+    }
 
-    var getMiddlePosition = function(mesh) {
-        var boundingInfo = mesh.getBoundingInfo().boundingBox;
-        console.log(boundingInfo);
-        console.log(mesh);
-        //(Ymax - Ymin)/2 + ymin
-        return new BABYLON.Vector3(boundingInfo.minimumWorld.x + ((boundingInfo.maximumWorld.x - boundingInfo.minimumWorld.x) / 2),
-            boundingInfo.minimumWorld.y + ((boundingInfo.maximumWorld.y - boundingInfo.minimumWorld.y) / 2),
-            boundingInfo.minimumWorld.z + ((boundingInfo.maximumWorld.z - boundingInfo.minimumWorld.z) / 2));
+    function getBoat(item) {
+        return item.id === "Boat";
     }
 
     // On key up, reset the movement
