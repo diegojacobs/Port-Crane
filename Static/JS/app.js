@@ -45,14 +45,12 @@ window.addEventListener('DOMContentLoaded', function() {
         /* camera2 = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(13.7, 6, -11), scene);
          //camera2.setTarget(new BABYLON.Vector3(200, 7, 0));
          camera2.rotation = new BABYLON.Vector3(0, 26.8,0);*/
-        camera2 = new BABYLON.FollowCamera("FollowCam", new BABYLON.Vector3(0, 0, 0), scene);
-        camera2.heightOffset = 1;
-        camera2.radius = 2;
-        camera2.rotationOffset = -90;
-        camera2.cameraAcceleration = 0.5;
+        camera2 = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(-5.5, 2, -4.5), scene);
+        camera2.rotation = new BABYLON.Vector3(0, 4.5, 0);
+        camera2.parent = elements.filter(getBoat)[0];
         // camera2.rotation = new BABYLON.Vector3(0, BABYLON.Tools.ToRadians(180), 0);
 
-        camera3 = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(-1, 9, 3.5), scene);
+        camera3 = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(-1, 9, 7.5), scene);
         camera3.rotation = new BABYLON.Vector3(0, 9.5, 0);
 
 
@@ -151,70 +149,46 @@ window.addEventListener('DOMContentLoaded', function() {
 
         //W
         if (evt.keyCode == 87) {
+            var boat = elements.filter(getBoat)[0];
+            var isle = elements.filter(getIsle)[0];
+            var transVector = new BABYLON.Vector3(1, 0, 0);
+            var transVectorContainer = new BABYLON.Vector3(1, 0, 0);
 
-            if (actualElement === true) {
-                var claw = elements.filter(getClaw)[0];
-                rotateElements(claw, BABYLON.Axis.X, -Math.PI / 12);
-                claw.rotationX === undefined ? claw.rotationX = -Math.PI / 12 :
-                    claw.rotationX -= Math.PI / 12;
-                if (holding && currentHoldingContainer !== undefined) {
-                    rotateElements(currentHoldingContainer, BABYLON.Axis.Y, -Math.PI / 12);
-                    currentHoldingContainer.rotationX === undefined ? currentHoldingContainer.rotationX = -Math.PI / 12 :
-                        currentHoldingContainer.rotationX -= Math.PI / 12;
+            translateElements(elements.filter(getBoat)[0], transVector);
+            translateElements(camera2, transVector);
+
+            for (var i = 0; i < containersWithShip.length; i++) {
+                var container = containersWithShip[i];
+                console.log(container.rotationX);
+                if (container.rotationX !== undefined) {
+                    rotateElements(container, BABYLON.Axis.Y, -container.rotationX);
+                    translateElements(container, transVectorContainer);
+                    rotateElements(container, BABYLON.Axis.Y, container.rotationX);
+                } else {
+                    translateElements(container, transVectorContainer);
                 }
-            } else {
-                var boat = elements.filter(getBoat)[0];
 
-                var isle = elements.filter(getIsle)[0];
-                var transVector = new BABYLON.Vector3(1, 0, 0);
-                var transVectorContainer = new BABYLON.Vector3(1, 0, 0);
-                translateElements(elements.filter(getBoat)[0], transVector);
-
-                for (var i = 0; i < containersWithShip.length; i++) {
-                    var container = containersWithShip[i];
-                    console.log(container.rotationX);
-                    if (container.rotationX !== undefined) {
-                        rotateElements(container, BABYLON.Axis.Y, -container.rotationX);
-                        translateElements(container, transVectorContainer);
-                        rotateElements(container, BABYLON.Axis.Y, container.rotationX);
-                    } else {
-                        translateElements(container, transVectorContainer);
-                    }
-
-                }
             }
         }
 
         //S
         if (evt.keyCode == 83) {
-            if (actualElement === true) {
-                var claw = elements.filter(getClaw)[0];
-                rotateElements(claw, BABYLON.Axis.X, Math.PI / 12);
-                claw.rotationX === undefined ? claw.rotationX = Math.PI / 12 :
-                    claw.rotationX += Math.PI / 12;
-                if (holding && currentHoldingContainer !== undefined) {
-                    rotateElements(currentHoldingContainer, BABYLON.Axis.Y, Math.PI / 12);
-                    currentHoldingContainer.rotationX === undefined ? currentHoldingContainer.rotationX = Math.PI / 12 :
-                        currentHoldingContainer.rotationX += Math.PI / 12;;
-                }
+            var transVector = new BABYLON.Vector3(-1, 0, 0);
+            var boat = elements.filter(getBoat)[0];
+            translateElements(boat, transVector);
+            translateElements(camera2, transVector);
 
-            } else {
-                var transVector = new BABYLON.Vector3(-1, 0, 0);
-                var boat = elements.filter(getBoat)[0];
-                translateElements(boat, transVector);
-                var isle = elements.filter(getIsle)[0];
-                var transVectorContainer = new BABYLON.Vector3(-1, 0, 0);
-                for (var i = 0; i < containersWithShip.length; i++) {
-                    var container = containersWithShip[i];
-                    console.log(container.rotationX);
-                    if (container.rotationX !== undefined) {
-                        rotateElements(container, BABYLON.Axis.Y, -container.rotationX);
-                        translateElements(container, transVectorContainer);
-                        rotateElements(container, BABYLON.Axis.Y, container.rotationX);
-                    } else {
-                        translateElements(container, transVectorContainer);
-                    }
-
+            var isle = elements.filter(getIsle)[0];
+            var transVectorContainer = new BABYLON.Vector3(-1, 0, 0);
+            for (var i = 0; i < containersWithShip.length; i++) {
+                var container = containersWithShip[i];
+                console.log(container.rotationX);
+                if (container.rotationX !== undefined) {
+                    rotateElements(container, BABYLON.Axis.Y, -container.rotationX);
+                    translateElements(container, transVectorContainer);
+                    rotateElements(container, BABYLON.Axis.Y, container.rotationX);
+                } else {
+                    translateElements(container, transVectorContainer);
                 }
 
             }
@@ -476,17 +450,17 @@ window.addEventListener('DOMContentLoaded', function() {
             rotateElements(crane, BABYLON.Axis.Y, Math.PI / 16);
         }
 
-        // ,
-        if (evt.keyCode === 188) {
-            var claw = elements.filter(getClaw)[0];
-            rotateElements(claw, BABYLON.Axis.Y, Math.PI / 16);
-        }
+        // // ,
+        // if (evt.keyCode === 188) {
+        //     var claw = elements.filter(getClaw)[0];
+        //     rotateElements(claw, BABYLON.Axis.Y, Math.PI / 16);
+        // }
 
-        // .
-        if (evt.keyCode === 190) {
-            var claw = elements.filter(getClaw)[0];
-            rotateElements(claw, BABYLON.Axis.Y, -Math.PI / 16);
-        }
+        // // .
+        // if (evt.keyCode === 190) {
+        //     var claw = elements.filter(getClaw)[0];
+        //     rotateElements(claw, BABYLON.Axis.Y, -Math.PI / 16);
+        // }
 
         //T
         if (evt.keyCode === 84) {
@@ -501,8 +475,8 @@ window.addEventListener('DOMContentLoaded', function() {
                     camera.attachControl(canvas);
                     break;
                 case 2:
-                    camera2.lockedTarget = elements.filter(getBoatCamera)[0];
                     scene.activeCamera = camera2;
+                    camera2.attachControl(canvas);
                     break;
                 case 3:
                     scene.activeCamera = camera3;
@@ -589,7 +563,7 @@ window.addEventListener('DOMContentLoaded', function() {
     }
 
     function getBoatCamera(item) {
-        return item.id === "Wheel1";
+        return item.id === "Cylinder30";
     }
 
     function getIsle(item) {
