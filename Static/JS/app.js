@@ -89,40 +89,54 @@ window.addEventListener('DOMContentLoaded', function() {
             // });
         });
 
+        // Skybox
+        var skybox = BABYLON.Mesh.CreateBox("skyBox", 1000.0, scene);
+        var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
+        skyboxMaterial.backFaceCulling = false;
+        skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("model/sky/TropicalSunnyDay", scene);
+        skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+        skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+        skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+        skyboxMaterial.disableLighting = true;
+        skybox.material = skyboxMaterial;
+
+        var ground = BABYLON.Mesh.CreateGroundFromHeightMap("ground", "model/water/heightMap.png", 512, 512, 32, -40, 10, scene, false);
+
+        var groundMaterial = new BABYLON.StandardMaterial("ground", scene);
+        groundMaterial.diffuseTexture = new BABYLON.Texture("model/water/ground.jpg", scene);
+        groundMaterial.diffuseTexture.uScale = 4;
+        groundMaterial.diffuseTexture.vScale = 4;
+        groundMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+        //ground.position.y = -15.0;
+        ground.material = groundMaterial;
+
         // Water
         var waterMesh = BABYLON.Mesh.CreateGround("waterMesh", 512, 512, 32, scene, false);
 
         var water = new BABYLON.WaterMaterial("water", scene);
         water.bumpTexture = new BABYLON.Texture("model/water/waterbump.png", scene);
 
-        // Ground
-        var groundMaterial = new BABYLON.StandardMaterial("groundMaterial", scene);
-        groundMaterial.diffuseTexture = new BABYLON.Texture("model/ground.jpg", scene);
-        groundMaterial.diffuseTexture.uScale = groundMaterial.diffuseTexture.vScale = 4;
-
-        var ground = BABYLON.Mesh.CreateGround("ground", 512, 512, 32, scene, false);
-        ground.checkCollisions = true;
-        ground.position.y = -11;
-        ground.material = groundMaterial;
-
         // Water properties
-        water.windForce = -15;
-        water.waveHeight = 1.3;
+        water.windForce = -20;
+        water.waveHeight = 0.3;
         water.windDirection = new BABYLON.Vector2(1, 1);
         water.waterColor = new BABYLON.Color3(0.1, 0.1, 0.6);
         water.colorBlendFactor = 0.3;
         water.bumpHeight = 0.1;
-        water.waveLength = 0.1;
+        water.waveLength = 0.8;
 
-
+        // Add skybox and ground to the reflection and refraction
+        water.addToRenderList(skybox);
         water.addToRenderList(ground);
+
         // Assign the water material
         waterMesh.material = water;
-        waterMesh.position.y = -10;
+        waterMesh.position.y = -2;
 
+        scene.collisionsEnabled = true;
+        camera.checkCollisions = true;
 
-
-
+        ground.checkCollisions = true;
         return scene;
     }
 
@@ -385,21 +399,20 @@ window.addEventListener('DOMContentLoaded', function() {
             var rope = elements.filter(getRope)[0];
             var rightBeam = elements.filter(getRightBeam)[0];
             var leftBeam = elements.filter(getLeftBeam)[0];
-            if (rope.position.z <= -5) {
+
+            if (rope.position.z <= -5 && rightBeam.position.z < 0) {
                 var cylinder = elements.filter(getCylinder)[0];
                 var transVector = new BABYLON.Vector3(0, 0, 1);
                 var transVector2 = new BABYLON.Vector3(0, 0, -1);
                 if (claw.rotationX !== undefined) {
-                    rotateElements(claw, BABYLON.Axis.Y, -claw.rotationX);
+                    //rotateElements(claw, BABYLON.Axis.Y, -claw.rotationX);
                     translateElements(claw, transVector2);
-                    rotateElements(claw, BABYLON.Axis.Y, claw.rotationX);
+                    //rotateElements(claw, BABYLON.Axis.Y, claw.rotationX);
                 } else {
                     translateElements(claw, transVector2);
                 }
-                var transVector3 = new BABYLON.Vector3(0, 0, 1);
-                scaleElements(rightBeam, dimensions[2], 0.9);
+                var transVector3 = new BABYLON.Vector3(0, 0, 0.1);
                 translateElements(rightBeam, transVector3);
-                scaleElements(leftBeam, dimensions[2], 0.9);
                 translateElements(leftBeam, transVector3);
 
                 translateElements(rope, transVector);
@@ -421,32 +434,31 @@ window.addEventListener('DOMContentLoaded', function() {
             var rightBeam = elements.filter(getRightBeam)[0];
             var leftBeam = elements.filter(getLeftBeam)[0];
 
-            var transVector = new BABYLON.Vector3(0, 0, -1);
-            var transVector2 = new BABYLON.Vector3(0, 0, 1);
+            if (rightBeam.position.z > -6) {
+                var transVector = new BABYLON.Vector3(0, 0, -1);
+                var transVector2 = new BABYLON.Vector3(0, 0, 1);
 
-            if (rope.position.z >= -31) {
-                if (claw.rotationX !== undefined) {
+                if (rope.position.z >= -31) {
+                    if (claw.rotationX !== undefined) {
+                        //rotateElements(claw, BABYLON.Axis.Y, -claw.rotationX);
+                        translateElements(claw, transVector2);
+                        //rotateElements(claw, BABYLON.Axis.Y, claw.rotationX);
+                    } else {
+                        translateElements(claw, transVector2);
+                    }
 
-                    rotateElements(claw, BABYLON.Axis.Y, -claw.rotationX);
-                    translateElements(claw, transVector2);
-                    rotateElements(claw, BABYLON.Axis.Y, claw.rotationX);
-                } else {
-                    translateElements(claw, transVector2);
-                }
-                var transVector3 = new BABYLON.Vector3(0, 0, -1);
-                scaleElements(rightBeam, dimensions[2], 1.1);
-                translateElements(rightBeam, transVector3);
-                scaleElements(leftBeam, dimensions[2], 1.1);
-                translateElements(leftBeam, transVector3);
+                    var transVector3 = new BABYLON.Vector3(0, 0, -0.1);
+                    translateElements(rightBeam, transVector3);
+                    translateElements(leftBeam, transVector3);
 
-
-                translateElements(rope, transVector);
-                translateElements(cylinder, transVector);
-                if (holding && currentHoldingContainer !== undefined) {
-                    var claw = elements.filter(getClaw)[0];
-                    currentHoldingContainer.position.x = claw.getAbsolutePosition().x;
-                    currentHoldingContainer.position.y = claw.getAbsolutePosition().y - 1.8;
-                    currentHoldingContainer.position.z = claw.getAbsolutePosition().z;
+                    translateElements(rope, transVector);
+                    translateElements(cylinder, transVector);
+                    if (holding && currentHoldingContainer !== undefined) {
+                        var claw = elements.filter(getClaw)[0];
+                        currentHoldingContainer.position.x = claw.getAbsolutePosition().x;
+                        currentHoldingContainer.position.y = claw.getAbsolutePosition().y - 1.8;
+                        currentHoldingContainer.position.z = claw.getAbsolutePosition().z;
+                    }
                 }
             }
         }
@@ -464,6 +476,17 @@ window.addEventListener('DOMContentLoaded', function() {
             rotateElements(crane, BABYLON.Axis.Y, Math.PI / 16);
         }
 
+        // ,
+        if (evt.keyCode === 188) {
+            var claw = elements.filter(getClaw)[0];
+            rotateElements(claw, BABYLON.Axis.Y, Math.PI / 16);
+        }
+
+        // .
+        if (evt.keyCode === 190) {
+            var claw = elements.filter(getClaw)[0];
+            rotateElements(claw, BABYLON.Axis.Y, -Math.PI / 16);
+        }
 
         //T
         if (evt.keyCode === 84) {
@@ -490,7 +513,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
         }
         //help
-        if (evt.keyCode == 57) {
+        if (evt.keyCode == 72) {
             var helpBlock = document.getElementById('helpBlock');
             var canvas = document.getElementById('canvasBlock');
 
@@ -582,11 +605,7 @@ window.addEventListener('DOMContentLoaded', function() {
     }
 
     // On key up, reset the movement
-    var onKeyUp = function(evt) {
-        if (evt.keyCode == 67) {
-            actualElement = !actualElement;
-        }
-    }
+    var onKeyUp = function(evt) {}
 
     // Register events with the right Babylon function
     BABYLON.Tools.RegisterTopRootEvents([{
