@@ -42,13 +42,9 @@ window.addEventListener('DOMContentLoaded', function() {
             BABYLON.Vector3.Zero(),
             scene
         );
-        /* camera2 = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(13.7, 6, -11), scene);
-         //camera2.setTarget(new BABYLON.Vector3(200, 7, 0));
-         camera2.rotation = new BABYLON.Vector3(0, 26.8,0);*/
         camera2 = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(-5.5, 2, -4.5), scene);
         camera2.rotation = new BABYLON.Vector3(0, 4.5, 0);
         camera2.parent = elements.filter(getBoat)[0];
-        // camera2.rotation = new BABYLON.Vector3(0, BABYLON.Tools.ToRadians(180), 0);
 
         camera3 = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(-1, 9, 7.5), scene);
         camera3.rotation = new BABYLON.Vector3(0, 9.5, 0);
@@ -81,11 +77,7 @@ window.addEventListener('DOMContentLoaded', function() {
             }
         );
 
-        scene.registerBeforeRender(function() {
-            // elements.forEach(function(element) {
-            //     element.checkCollisions = true;              
-            // });
-        });
+        scene.registerBeforeRender(function() {});
 
         // Skybox
         var skybox = BABYLON.Mesh.CreateBox("skyBox", 1000.0, scene);
@@ -105,7 +97,6 @@ window.addEventListener('DOMContentLoaded', function() {
         groundMaterial.diffuseTexture.uScale = 4;
         groundMaterial.diffuseTexture.vScale = 4;
         groundMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
-        //ground.position.y = -15.0;
         ground.material = groundMaterial;
 
         // Water
@@ -159,7 +150,6 @@ window.addEventListener('DOMContentLoaded', function() {
 
             for (var i = 0; i < containersWithShip.length; i++) {
                 var container = containersWithShip[i];
-                console.log(container.rotationX);
                 if (container.rotationX !== undefined) {
                     rotateElements(container, BABYLON.Axis.Y, -container.rotationX);
                     translateElements(container, transVectorContainer);
@@ -182,7 +172,6 @@ window.addEventListener('DOMContentLoaded', function() {
             var transVectorContainer = new BABYLON.Vector3(-1, 0, 0);
             for (var i = 0; i < containersWithShip.length; i++) {
                 var container = containersWithShip[i];
-                console.log(container.rotationX);
                 if (container.rotationX !== undefined) {
                     rotateElements(container, BABYLON.Axis.Y, -container.rotationX);
                     translateElements(container, transVectorContainer);
@@ -200,7 +189,6 @@ window.addEventListener('DOMContentLoaded', function() {
                 var crane = elements.filter(getCrane)[0];
                 rotateElements(crane, BABYLON.Axis.Y, Math.PI / 12);
                 var claw = elements.filter(getClaw)[0];
-                console.log(claw.getAbsolutePosition());
                 if (holding && currentHoldingContainer !== undefined) {
 
                     currentHoldingContainer.position.x = claw.getAbsolutePosition().x;
@@ -236,7 +224,6 @@ window.addEventListener('DOMContentLoaded', function() {
             } else {
                 var isle = elements.filter(getIsle)[0];
                 var boat = elements.filter(getBoat)[0];
-                console.log(isle.intersectsMesh(boat, true));
                 rotateElements(boat, BABYLON.Axis.Y, Math.PI / 16);
                 for (var i = 0; i < containersWithShip.length; i++) {
                     var container = containersWithShip[i];
@@ -246,43 +233,15 @@ window.addEventListener('DOMContentLoaded', function() {
         }
         // o
         if (evt.keyCode === 76) {
-
             var claw = elements.filter(getClaw)[0];
             var rope = elements.filter(getRope)[0];
             var boat = elements.filter(getBoat)[0];
 
-            var clawPosition = claw.getAbsolutePosition();
-            var boatPosition = boat.getAbsolutePosition();
-            readyToDrop = false;
-            var center = clawPosition.x
-            if ((Math.abs(clawPosition.y) - 3) < Math.abs(boatPosition.y) &&
-                center > (boatPosition.x - 21.0) && center < (boatPosition.x + 20.77) &&
-                clawPosition.z > (boatPosition.z - 5.0) && clawPosition.z < (boatPosition.z + 5.0)) {
-                console.log(boatPosition);
-                console.log(clawPosition);
-                readyToDrop = true;
-                //drop on choque
-                console.log('choca');
-            } else if (clawPosition.z > -3 && clawPosition.y <= 3.72) {
-                console.log('choca isla');
-            } else {
-
-
-                var transVector = new BABYLON.Vector3(0, -0.5, 0);
-                var transVector2 = new BABYLON.Vector3(0, -1, 0);
-                translateElements(claw, transVector2);
-                scaleElements(rope, dimensions[1], 1.1);
-                translateElements(rope, transVector);
-            }
-            if (holding && currentHoldingContainer !== undefined) {
-                var claw = elements.filter(getClaw)[0];
-                currentHoldingContainer.position.x = claw.getAbsolutePosition().x;
-                currentHoldingContainer.position.y = claw.getAbsolutePosition().y - 1.8;;
-                currentHoldingContainer.position.z = claw.getAbsolutePosition().z;
-            }
-
-
-
+            var transVector = new BABYLON.Vector3(0, -0.5, 0);
+            var transVector2 = new BABYLON.Vector3(0, -1, 0);
+            translateElements(claw, transVector2);
+            scaleElements(rope, dimensions[1], 1.1);
+            translateElements(rope, transVector);
         }
         // l
         if (evt.keyCode === 79) {
@@ -293,78 +252,43 @@ window.addEventListener('DOMContentLoaded', function() {
             translateElements(claw, transVector2);
             scaleElements(rope, dimensions[1], 0.9);
             translateElements(rope, transVector);
-            if (holding && currentHoldingContainer !== undefined) {
-                var claw = elements.filter(getClaw)[0];
-                currentHoldingContainer.position.x = claw.getAbsolutePosition().x;
-                currentHoldingContainer.position.y = claw.getAbsolutePosition().y - 1.8;;
-                currentHoldingContainer.position.z = claw.getAbsolutePosition().z;
-            }
         }
+
         // spacebar
         if (evt.keyCode === 32) {
-            //dropoff command
-            console.log('drop')
-            console.log(holding)
-            console.log(readyToDrop)
-            if (holding && readyToDrop && currentHoldingContainer !== undefined) {
-                if (!containersWithShip.includes(currentHoldingContainer)) {
-                    containersWithShip.push(currentHoldingContainer);
-                    currentHoldingContainer = undefined;
-                    console.log(containersWithShip);
-                }
-            } else {
 
-                //hold one container
-                //check for containers
+            console.log(holding)
+            if (holding) {
+                currentHoldingContainer.parent = {};
+                currentHoldingContainer = {};
+            } else {
                 var containers = elements.filter(getContainers);
                 var clawPosition = elements.filter(getClaw)[0].getAbsolutePosition();
-                var size = containers[0].getBoundingInfo().boundingBox.extendSize;
-                var closer_container = undefined;
-                var currentDiff = 10000;
-                var currentDiffZ = 10000;
-                if (clawPosition.z > 1 && clawPosition.z <= 15 &&
-                    clawPosition.x < -11 && clawPosition.x > -21 &&
-                    clawPosition.y <= 12) {
-                    for (var i = 0; i < containers.length; i++) {
-                        var c1 = containers[i];
-                        var posC1 = c1.getAbsolutePosition();
-                        if (!containersWithShip.includes(c1)) {
-                            console.log(Math.abs(Math.abs(posC1.y) - Math.abs(clawPosition.y)) < currentDiff);
-                            console.log(Math.abs(Math.abs(posC1.z) - Math.abs(clawPosition.z)), '<', currentDiffZ, Math.abs(Math.abs(posC1.z) - Math.abs(clawPosition.z)) < currentDiffZ);
-                            if (Math.abs(Math.abs(posC1.y) - Math.abs(clawPosition.y)) < currentDiff &&
-                                Math.abs(Math.abs(posC1.z) - Math.abs(clawPosition.z)) < currentDiffZ) {
-                                //console.log( Math.abs(posC1.z) - Math.abs(clawPosition.z) > currentDiffZ);
-                                console.log('compare');
-                                console.log(Math.abs(Math.abs(posC1.y) - Math.abs(clawPosition.y)));
-                                console.log(currentDiff);
-                                currentDiff = Math.abs(Math.abs(posC1.y) - Math.abs(clawPosition.y));
-                                currentDiffZ = Math.abs(Math.abs(posC1.z) - Math.abs(clawPosition.z));
-                                closer_container = c1;
+                var container = {};
+                for (var i = 0; i < containers.length; i++) {
+                    var temp = containers[i];
+                    var x = temp.absolutePosition.x;
+                    var y = temp.absolutePosition.y;
+                    var z = temp.absolutePosition.z;
+
+                    if ((x + 1 > clawPosition.x && x - 1 < clawPosition.x) || (x + 1 < clawPosition.x && x - 1 > clawPosition.x)) {
+                        if ((y + 2 > clawPosition.y && y - 2 < clawPosition.y) || (y + 2 < clawPosition.y && y - 2 > clawPosition.y)) {
+                            if ((z + 1 > clawPosition.z && z - 1 < clawPosition.z) || (z + 1 < clawPosition.y && z - 1 > clawPosition.z)) {
+                                console.log(temp);
+                                temp.parent = elements.filter(getClaw)[0];
+                                temp.position.x = 0;
+                                temp.position.y = -1.8;
+                                temp.position.z = 0;
+                                rotateElements(temp, BABYLON.Axis.Y, -Math.PI / 2);
+
+                                currentHoldingContainer = temp;
                             }
-                            console.log('verfiy')
-                            console.log(posC1.z);
-                            console.log(clawPosition.z);
-                            console.log(Math.abs(Math.abs(posC1.z) - Math.abs(clawPosition.z)));
-
-                            console.log(c1.id);
-                            closer_container === undefined ? '' : console.log(closer_container.id);
                         }
-
                     }
-
                 }
-                console.log(clawPosition.z);
-                console.log(clawPosition.z > 1 && clawPosition.z <= 15);
-                currentHoldingContainer = closer_container
-
             }
 
-            if (holding === true && readyToDrop === true) {
-                holding = false;
-            } else {
-                holding = true;
-            }
-
+            holding = !holding;
         }
 
         // i
@@ -376,12 +300,10 @@ window.addEventListener('DOMContentLoaded', function() {
 
             if (rope.position.z <= -5 && rightBeam.position.z < 0) {
                 var cylinder = elements.filter(getCylinder)[0];
-                var transVector = new BABYLON.Vector3(0, 0, 1);
-                var transVector2 = new BABYLON.Vector3(0, 0, -1);
+                var transVector = new BABYLON.Vector3(0, 0, 2);
+                var transVector2 = new BABYLON.Vector3(0, 0, -2);
                 if (claw.rotationX !== undefined) {
-                    //rotateElements(claw, BABYLON.Axis.Y, -claw.rotationX);
                     translateElements(claw, transVector2);
-                    //rotateElements(claw, BABYLON.Axis.Y, claw.rotationX);
                 } else {
                     translateElements(claw, transVector2);
                 }
@@ -391,12 +313,6 @@ window.addEventListener('DOMContentLoaded', function() {
 
                 translateElements(rope, transVector);
                 translateElements(cylinder, transVector);
-                if (holding && currentHoldingContainer !== undefined) {
-                    var claw = elements.filter(getClaw)[0];
-                    currentHoldingContainer.position.x = claw.getAbsolutePosition().x;
-                    currentHoldingContainer.position.y = claw.getAbsolutePosition().y - 1.8;
-                    currentHoldingContainer.position.z = claw.getAbsolutePosition().z;
-                }
             }
         }
 
@@ -409,14 +325,12 @@ window.addEventListener('DOMContentLoaded', function() {
             var leftBeam = elements.filter(getLeftBeam)[0];
 
             if (rightBeam.position.z > -6) {
-                var transVector = new BABYLON.Vector3(0, 0, -1);
-                var transVector2 = new BABYLON.Vector3(0, 0, 1);
+                var transVector = new BABYLON.Vector3(0, 0, -2);
+                var transVector2 = new BABYLON.Vector3(0, 0, 2);
 
                 if (rope.position.z >= -31) {
                     if (claw.rotationX !== undefined) {
-                        //rotateElements(claw, BABYLON.Axis.Y, -claw.rotationX);
                         translateElements(claw, transVector2);
-                        //rotateElements(claw, BABYLON.Axis.Y, claw.rotationX);
                     } else {
                         translateElements(claw, transVector2);
                     }
@@ -427,12 +341,6 @@ window.addEventListener('DOMContentLoaded', function() {
 
                     translateElements(rope, transVector);
                     translateElements(cylinder, transVector);
-                    if (holding && currentHoldingContainer !== undefined) {
-                        var claw = elements.filter(getClaw)[0];
-                        currentHoldingContainer.position.x = claw.getAbsolutePosition().x;
-                        currentHoldingContainer.position.y = claw.getAbsolutePosition().y - 1.8;
-                        currentHoldingContainer.position.z = claw.getAbsolutePosition().z;
-                    }
                 }
             }
         }
@@ -445,7 +353,7 @@ window.addEventListener('DOMContentLoaded', function() {
         }
 
         // ñ ;
-        if (evt.keyCode === 192) {
+        if (evt.keyCode === 192 || evt.keyCode === 186) {
             var crane = elements.filter(getCrane)[0];
             rotateElements(crane, BABYLON.Axis.Y, Math.PI / 16);
         }
