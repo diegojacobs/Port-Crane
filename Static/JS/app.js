@@ -256,10 +256,29 @@ window.addEventListener('DOMContentLoaded', function() {
 
         // spacebar
         if (evt.keyCode === 32) {
-
-            console.log(holding)
             if (holding) {
-                currentHoldingContainer.parent = {};
+                var boatPosition = elements.filter(getClaw)[0].getAbsolutePosition();
+                var x = currentHoldingContainer.absolutePosition.x;
+                var y = currentHoldingContainer.absolutePosition.y;
+                var z = currentHoldingContainer.absolutePosition.z;
+
+                if ((x + 1 > boatPosition.x && x - 1 < boatPosition.x) || (x + 1 < boatPosition.x && x - 1 > boatPosition.x)) {
+                    if ((y + 2 > boatPosition.y && y - 2 < boatPosition.y) || (y + 2 < boatPosition.y && y - 2 > boatPosition.y)) {
+                        if ((z + 1 > boatPosition.z && z - 1 < boatPosition.z) || (z + 1 < boatPosition.y && z - 1 > boatPosition.z)) {
+                            currentHoldingContainer.parent = elements.filter(getBoat)[0];
+                            currentHoldingContainer.position.x = 5.5;
+                            currentHoldingContainer.position.y = 1.5;
+                            currentHoldingContainer.position.z = 0;
+                        } else {
+                            currentHoldingContainer.parent = {};
+                        }
+                    } else {
+                        currentHoldingContainer.parent = {};
+                    }
+                } else {
+                    currentHoldingContainer.parent = {};
+                }
+
                 currentHoldingContainer = {};
             } else {
                 var containers = elements.filter(getContainers);
