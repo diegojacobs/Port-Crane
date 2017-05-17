@@ -90,7 +90,7 @@ window.addEventListener('DOMContentLoaded', function() {
         skyboxMaterial.disableLighting = true;
         skybox.material = skyboxMaterial;
 
-        var ground = BABYLON.Mesh.CreateGroundFromHeightMap("ground", "model/water/heightMap.png", 512, 512, 32, -40, 10, scene, false);
+        var ground = BABYLON.Mesh.CreateGroundFromHeightMap("ground", "model/water/waterbump.png", 512, 512, 32, -40, 10, scene, false);
 
         var groundMaterial = new BABYLON.StandardMaterial("ground", scene);
         groundMaterial.diffuseTexture = new BABYLON.Texture("model/water/ground.jpg", scene);
@@ -256,7 +256,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
         // spacebar
         if (evt.keyCode === 32) {
-            if (holding) {
+            if (holding && currentHoldingContainer) {
                 var boatPosition = elements.filter(getClaw)[0].getAbsolutePosition();
                 var x = currentHoldingContainer.absolutePosition.x;
                 var y = currentHoldingContainer.absolutePosition.y;
@@ -270,16 +270,16 @@ window.addEventListener('DOMContentLoaded', function() {
                             currentHoldingContainer.position.y = 1.5;
                             currentHoldingContainer.position.z = 0;
                         } else {
-                            currentHoldingContainer.parent = {};
+                            currentHoldingContainer.parent = undefined;
                         }
                     } else {
-                        currentHoldingContainer.parent = {};
+                        currentHoldingContainer.parent = undefined;
                     }
                 } else {
-                    currentHoldingContainer.parent = {};
+                    currentHoldingContainer.parent = undefined;
                 }
 
-                currentHoldingContainer = {};
+                currentHoldingContainer = undefined;
             } else {
                 var containers = elements.filter(getContainers);
                 var clawPosition = elements.filter(getClaw)[0].getAbsolutePosition();
